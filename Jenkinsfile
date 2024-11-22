@@ -22,6 +22,11 @@ pipeline {
                 stash includes: 'dist/vuexy/**', name: 'angular-build'
             }
         }
+        stage('Debug Workspace') {
+            steps {
+                sh 'ls -alh $WORKSPACE'
+            }
+        }
         stage('Upload to S3') {
             agent {
                 docker {
@@ -30,8 +35,9 @@ pipeline {
                 }
             }
             steps {
-                unstash 'angular-build'
                 script {
+                    unstash 'angular-build'
+                    sh 'ls -alh dist/vuexy/'
                     echo "Uploading Angular app to S3 bucket: ${BUCKET_NAME}"
                     sh """
                     aws s3 sync dist/vuexy/ s3://${BUCKET_NAME} --delete
