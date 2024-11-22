@@ -19,6 +19,7 @@ pipeline {
         stage('Build Angular') {
             steps {
                 sh 'npm run build:prod'
+                stash includes: 'dist/vuexy/**', name: 'angular-build'
             }
         }
         stage('Upload to S3') {
@@ -29,6 +30,7 @@ pipeline {
                 }
             }
             steps {
+                unstash 'angular-build'
                 script {
                     echo "Uploading Angular app to S3 bucket: ${BUCKET_NAME}"
                     sh """
