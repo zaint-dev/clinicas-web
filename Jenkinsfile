@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:20.18'
-        }
-    }
+    agent none
     environment {
         AWS_ACCESS_KEY_ID = credentials('aws-access-key-id-zaint')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key-zaint')
@@ -11,20 +7,16 @@ pipeline {
         DISTRIBUTION_ID = credentials('cloudfront-distribution-id-zaint')
     }
     stages {
-        stage('Install Dependencies') {
+        stage('Build Angular') {
+            agent {
+                docker {
+                    image 'node:20.18'
+                }
+            }
             steps {
                 sh 'npm install --legacy-peer-deps'
-            }
-        }
-        stage('Build Angular') {
-            steps {
                 sh 'npm run build:prod'
                 stash includes: 'dist/vuexy/**', name: 'angular-build'
-            }
-        }
-        stage('Debug Workspace') {
-            steps {
-                sh 'ls -alh $WORKSPACE'
             }
         }
         stage('Upload to S3') {
@@ -42,18 +34,6 @@ pipeline {
                     sh """
                     aws s3 sync dist/vuexy/ s3://${BUCKET_NAME} --delete
                     """
-                }
-            }
-        }
-        stage('Invalidate CloudFront Cache') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    args '--entrypoint=""'
-                }
-            }
-            steps {
-                script {
                     echo "Invalidating CloudFront cache"
                     sh """
                     aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID} --paths "/*"
@@ -61,7 +41,6 @@ pipeline {
                 }
             }
         }
-        
     }
     post {
         always {
