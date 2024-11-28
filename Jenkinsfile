@@ -40,6 +40,8 @@ pipeline {
             }
             environment {
                 CHROME_BIN = '/usr/bin/chromium-browser'
+                XDG_CACHE_HOME= '/tmp/.chromium'
+                XDG_CONFIG_HOME= '/tmp/.chromium'
             }
             steps {
                 echo "Running tests..."

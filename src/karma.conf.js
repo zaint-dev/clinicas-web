@@ -31,12 +31,12 @@ module.exports = function (config) {
       ChromeHeadlessCustom: {
         base: 'ChromeHeadless',
         flags: [
-          '--no-sandbox',               // Evita problemas de permisos
-          '--disable-dev-shm-usage',    // Reduce el uso de /dev/shm
-          '--disable-gpu',              // Desactiva la GPU
-          '--disable-extensions',       // Desactiva extensiones de Chrome
-          '--disable-software-rasterizer', // Evita problemas de renderizado
-          '--disable-setuid-sandbox',   // Desactiva el sandboxing adicional
+          '--no-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--disable-extensions',
+          '--disable-software-rasterizer',
+          '--disable-setuid-sandbox',
           '--disable-crash-reporter',
         ],
       },
