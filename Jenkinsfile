@@ -16,6 +16,7 @@ pipeline {
             stages {
                 stage('Install Dependencies') {
                     steps {
+                        sh 'npm cache clean -force'
                         echo "Installing dependencies..."
                         sh 'npm install --legacy-peer-deps'
                     }
