@@ -19,7 +19,7 @@ pipeline {
                         sh 'npm cache clean -force'
                         sh 'rm -rf node_modules package-lock.json'
                         echo "Installing dependencies..."
-                        sh 'npm install --legacy-peer-deps'
+                        sh 'npm install --legacy-peer-deps --cache /tmp/.npm'
                     }
                 }
                 stage('Run Tests') {
