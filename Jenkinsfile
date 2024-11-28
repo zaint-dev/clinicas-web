@@ -23,12 +23,6 @@ pipeline {
                         sh 'npm install --legacy-peer-deps --cache /tmp/.npm'
                     }
                 }
-                stage('Run Tests') {
-                    steps {
-                        echo "Running tests..."
-                        sh 'npm run test'
-                    }
-                }
                 stage('Build Angular App') {
                     steps {
                         echo "Building Angular app in production mode..."
@@ -36,6 +30,18 @@ pipeline {
                         stash includes: 'dist/vuexy/**', name: 'angular-build'
                     }
                 }
+            }
+        }
+        stage('Run Tests') {
+            agent {
+                docker {
+                    image 'cypress/base:node'
+                }
+            }
+            steps {
+                echo "Running tests..."
+                sh 'npm install --legacy-peer-deps'
+                sh 'npm run test'
             }
         }
         stage('Upload to S3 & Invalidate Cache') {
@@ -77,7 +83,6 @@ pipeline {
     post {
         always {
             echo 'Cleaning up workspace...'
-            cleanWs()
         }
         success {
             echo 'Pipeline completed successfully!'
