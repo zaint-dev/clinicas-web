@@ -37,7 +37,7 @@ module.exports = function (config) {
           '--disable-extensions',       // Desactiva extensiones de Chrome
           '--disable-software-rasterizer', // Evita problemas de renderizado
           '--disable-setuid-sandbox',   // Desactiva el sandboxing adicional
-          '--database=/tmp/crashpad-db', // Ruta de la base de datos de crashpad
+          '--disable-crash-reporter',
         ],
       },
     },

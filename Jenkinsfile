@@ -47,8 +47,7 @@ pipeline {
                 sh 'rm -rf node_modules package-lock.json'
                 sh 'npm install --legacy-peer-deps --cache /tmp/.npm'
                 echo "Running tests..."
-                sh 'mkdir -p /tmp/crashpad-db'
-                sh 'CHROME_EXTRA_ARGS="--database=/tmp/crashpad-db" npm run test'
+                sh 'npm run test'
             }
         }
         stage('Upload to S3 & Invalidate Cache') {
