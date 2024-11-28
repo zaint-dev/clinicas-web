@@ -7,16 +7,32 @@ pipeline {
         DISTRIBUTION_ID = credentials('cloudfront-distribution-id-zaint')
     }
     stages {
-        stage('Build Angular') {
+        stage('Build & Test Angular') {
             agent {
                 docker {
                     image 'node:20.18'
                 }
             }
-            steps {
-                sh 'npm install --legacy-peer-deps'
-                sh 'npm run build:prod'
-                stash includes: 'dist/vuexy/**', name: 'angular-build'
+            stages {
+                stage('Install Dependencies') {
+                    steps {
+                        echo "Installing dependencies..."
+                        sh 'npm install --legacy-peer-deps'
+                    }
+                }
+                stage('Run Tests') {
+                    steps {
+                        echo "Running tests..."
+                        sh 'npm run test'
+                    }
+                }
+                stage('Build Angular App') {
+                    steps {
+                        echo "Building Angular app in production mode..."
+                        sh 'npm run build:prod'
+                        stash includes: 'dist/vuexy/**', name: 'angular-build'
+                    }
+                }
             }
         }
         stage('Upload to S3') {
@@ -40,6 +56,14 @@ pipeline {
                     """
                 }
             }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs for more details.'
         }
     }
 }
