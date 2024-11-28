@@ -63,7 +63,7 @@ pipeline {
             echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed. Check logs for more details.'
+            echo 'Ocurrion un error en el pipeline'
         }
     }
 }
