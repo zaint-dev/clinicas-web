@@ -5,6 +5,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key-zaint')
         BUCKET_NAME = 'angular-app-bucket-vnsa3i'
         DISTRIBUTION_ID = credentials('cloudfront-distribution-id-zaint')
+        PUPPETEER_CACHE_DIR = '/tmp/puppeteer-cache'
     }
     stages {
         stage('Build & Test Angular') {
