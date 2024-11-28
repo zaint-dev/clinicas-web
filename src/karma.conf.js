@@ -24,8 +24,22 @@ module.exports = function (config) {
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
-    browsers: ['Chrome'],
-    singleRun: false
+    autoWatch: false,
+    browsers: ['ChromeHeadlessCustom'],
+    singleRun: true,
+    customLaunchers: {
+      ChromeHeadlessCustom: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox',               // Evita problemas de permisos
+          '--disable-dev-shm-usage',    // Reduce el uso de /dev/shm
+          '--disable-gpu',              // Desactiva la GPU
+          '--disable-extensions',       // Desactiva extensiones de Chrome
+          '--disable-software-rasterizer', // Evita problemas de renderizado
+          '--disable-crash-reporter',   // Desactiva crashpad_handler
+          '--disable-setuid-sandbox',   // Desactiva el sandboxing adicional
+        ],
+      },
+    },
   });
 };
