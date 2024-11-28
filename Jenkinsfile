@@ -35,25 +35,38 @@ pipeline {
                 }
             }
         }
-        stage('Upload to S3') {
+        stage('Upload to S3 & Invalidate Cache') {
             agent {
                 docker {
                     image 'amazon/aws-cli'
                     args '--entrypoint=""'
                 }
             }
-            steps {
-                script {
-                    unstash 'angular-build'
-                    sh 'ls -alh dist/vuexy/'
-                    echo "Uploading Angular app to S3 bucket: ${BUCKET_NAME}"
-                    sh """
-                    aws s3 sync dist/vuexy/ s3://${BUCKET_NAME} --delete
-                    """
-                    echo "Invalidating CloudFront cache"
-                    sh """
-                    aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID} --paths "/*"
-                    """
+            stages {
+                stage('Prepare S3 Upload') {
+                    steps {
+                        script {
+                            echo "Preparing to upload to S3..."
+                            unstash 'angular-build'
+                            sh 'ls -alh dist/vuexy/'
+                        }
+                    }
+                }
+                stage('Upload to S3') {
+                    steps {
+                        echo "Uploading Angular app to S3 bucket: ${BUCKET_NAME}..."
+                        sh """
+                        aws s3 sync dist/vuexy/ s3://${BUCKET_NAME} --delete
+                        """
+                    }
+                }
+                stage('Invalidate CloudFront Cache') {
+                    steps {
+                        echo "Invalidating CloudFront cache for distribution ID: ${DISTRIBUTION_ID}..."
+                        sh """
+                        aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID} --paths "/*"
+                        """
+                    }
                 }
             }
         }
