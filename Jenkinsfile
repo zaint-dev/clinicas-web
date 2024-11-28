@@ -39,6 +39,7 @@ pipeline {
                 }
             }
             environment {
+                PUPPETEER_SKIP_DOWNLOAD = 'true'
                 CHROME_BIN = '/usr/bin/chromium-browser'
             }
             steps {
