@@ -36,8 +36,8 @@ module.exports = function (config) {
           '--disable-gpu',              // Desactiva la GPU
           '--disable-extensions',       // Desactiva extensiones de Chrome
           '--disable-software-rasterizer', // Evita problemas de renderizado
-          '--disable-crash-reporter',   // Desactiva crashpad_handler
           '--disable-setuid-sandbox',   // Desactiva el sandboxing adicional
+          '--database=/tmp/crashpad-db', // Ruta de la base de datos de crashpad
         ],
       },
     },

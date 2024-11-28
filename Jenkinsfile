@@ -5,7 +5,6 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key-zaint')
         BUCKET_NAME = 'angular-app-bucket-vnsa3i'
         DISTRIBUTION_ID = credentials('cloudfront-distribution-id-zaint')
-        PUPPETEER_SKIP_DOWNLOAD = 'true'
     }
     stages {
         stage('Build & Test Angular') {
@@ -36,10 +35,10 @@ pipeline {
             agent {
                 docker {
                     image 'popckorn/node22-chrome:latest'
+                    args '--shm-size=2g'
                 }
             }
             environment {
-                PUPPETEER_SKIP_DOWNLOAD = 'true'
                 CHROME_BIN = '/usr/bin/chromium-browser'
             }
             steps {
@@ -48,7 +47,8 @@ pipeline {
                 sh 'rm -rf node_modules package-lock.json'
                 sh 'npm install --legacy-peer-deps --cache /tmp/.npm'
                 echo "Running tests..."
-                sh 'npm run test'
+                sh 'mkdir -p /tmp/crashpad-db'
+                sh 'CHROME_EXTRA_ARGS="--database=/tmp/crashpad-db" npm run test'
             }
         }
         stage('Upload to S3 & Invalidate Cache') {
