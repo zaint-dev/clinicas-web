@@ -73,7 +73,10 @@ pipeline {
         }
     }
     post {
-        cleanWs()
+        always {
+            echo 'Cleaning up workspace...'
+            cleanWs()
+        }
         success {
             echo 'Pipeline completed successfully!'
         }
