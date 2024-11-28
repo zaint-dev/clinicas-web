@@ -73,6 +73,7 @@ pipeline {
         }
     }
     post {
+        cleanWs()
         success {
             echo 'Pipeline completed successfully!'
         }
