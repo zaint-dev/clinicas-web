@@ -7,6 +7,7 @@ pipeline {
         DISTRIBUTION_ID = credentials('cloudfront-distribution-id')
         SONAR_HOST_URL = 'http://ec2-34-201-94-13.compute-1.amazonaws.com:9000' 
         SONAR_LOGIN = credentials('sonar-token-angular')
+        HOME = '/tmp'
     }
     stages {
         stage('Build & Test Angular') {
@@ -68,6 +69,7 @@ pipeline {
                   -Dsonar.sources=. \
                   -Dsonar.host.url=$SONAR_HOST_URL \
                   -Dsonar.login=$SONAR_LOGIN \
+                  -Dsonar.userHome=/tmp/.sonar
                 """
             }
         }
