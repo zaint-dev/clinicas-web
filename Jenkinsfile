@@ -1,10 +1,12 @@
 pipeline {
-    agent none
+    agent any
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id-zaint')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key-zaint')
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
         BUCKET_NAME = 'angular-app-bucket-vnsa3i'
-        DISTRIBUTION_ID = credentials('cloudfront-distribution-id-zaint')
+        DISTRIBUTION_ID = credentials('cloudfront-distribution-id')
+        SONAR_HOST_URL = 'http://ec2-34-201-94-13.compute-1.amazonaws.com:9000' 
+        SONAR_LOGIN = credentials('sonar-token-angular')
     }
     stages {
         stage('Build & Test Angular') {
@@ -52,6 +54,23 @@ pipeline {
                 sh 'npm run test'
             }
         }
+        stage('SonarQube Analysis') {
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:latest'
+                }
+            }
+            steps {
+                echo "Running SonarQube analysis..."
+                sh """
+                sonar-scanner \
+                  -Dsonar.projectKey=clinicas-dialisis-web \
+                  -Dsonar.sources=. \
+                  -Dsonar.host.url=$SONAR_HOST_URL \
+                  -Dsonar.login=$SONAR_LOGIN \
+                """
+            }
+        }
         stage('Upload to S3 & Invalidate Cache') {
             agent {
                 docker {
@@ -86,14 +105,25 @@ pipeline {
         }
     }
     post {
-        always {
-            echo 'Cleaning up workspace...'
-        }
         success {
-            echo 'Pipeline completed successfully!'
+            withCredentials([string(credentialsId: 'discord-webhook-url', variable: 'DISCORD_WEBHOOK')]) {
+                discordSend description: '✅ Build completado con éxito.', 
+                            footer: 'Clinica Dialisis Frontend', 
+                            link: env.BUILD_URL, 
+                            result: currentBuild.currentResult, 
+                            title: env.JOB_NAME, 
+                            webhookURL: DISCORD_WEBHOOK
+            }
         }
         failure {
-            echo 'Ocurrion un error en el pipeline'
-        }
+            withCredentials([string(credentialsId: 'discord-webhook-url', variable: 'DISCORD_WEBHOOK')]) {
+                discordSend description: '❌ Build fallido.', 
+                            footer: 'Clinicas Dialisis Frontend', 
+                            link: env.BUILD_URL, 
+                            result: currentBuild.currentResult, 
+                            title: env.JOB_NAME, 
+                            webhookURL: DISCORD_WEBHOOK
+            }
+        } 
     }
 }
