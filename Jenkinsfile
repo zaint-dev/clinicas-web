@@ -63,14 +63,16 @@ pipeline {
             }
             steps {
                 echo "Running SonarQube analysis..."
-                sh """
-                sonar-scanner \
-                  -Dsonar.projectKey=clinicas-dialisis-web \
-                  -Dsonar.sources=. \
-                  -Dsonar.host.url=$SONAR_HOST_URL \
-                  -Dsonar.login=$SONAR_LOGIN \
-                  -Dsonar.userHome=/tmp/.sonar
-                """
+                withCredentials([string(credentialsId: 'sonar-token-angular', variable: 'SONAR_LOGIN')]) {
+                    sh """
+                    sonar-scanner \
+                    -Dsonar.projectKey=clinicas-dialisis-web \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=${SONAR_HOST_URL} \
+                    -Dsonar.login=${SONAR_LOGIN} \
+                    -Dsonar.userHome=/tmp/.sonar
+                    """
+                }
             }
         }
         stage('Upload to S3 & Invalidate Cache') {
