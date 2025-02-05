@@ -5,7 +5,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
         BUCKET_NAME = 'angular-app-bucket-vnsa3i'
         DISTRIBUTION_ID = credentials('cloudfront-distribution-id')
-        SONAR_HOST_URL = 'http://ec2-54-91-122-219.compute-1.amazonaws.com:9000' 
+        SONAR_HOST_URL = 'http://ec2-50-17-2-221.compute-1.amazonaws.com:9000' 
         SONAR_LOGIN = credentials('sonar-token-angular')
         HOME = '/tmp'
     }
